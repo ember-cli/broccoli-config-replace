@@ -1,4 +1,4 @@
-# broccoli-config-replace
+# broccoli-config-replace [![Build Status](https://travis-ci.org/ember-cli/broccoli-config-replace.svg)](https://travis-ci.org/ember-cli/broccoli-config-replace)
 
 Simple templating using a config.json and regex patterns.
 
