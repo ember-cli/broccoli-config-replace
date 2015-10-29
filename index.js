@@ -30,7 +30,7 @@ ConfigReplace.prototype.build = function () {
 
     if (entry) {
       filePath = entry.file;
-      contents = entry.contents
+      contents = entry.contents;
     } else {
       filePath = file;
       contents = this.processFile(config, filePath);
