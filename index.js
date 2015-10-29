@@ -13,6 +13,8 @@ function ConfigReplace(inputNode, configNode, options) {
     annotation: options.annotation
   });
 
+  this._persistentOutput = true;
+
   this.options = options;
   this._cache = {};
 }
@@ -28,14 +30,11 @@ ConfigReplace.prototype.build = function () {
         entry = this._cache[key.hash],
         contents, filePath;
 
-    if (entry) {
-      filePath = entry.file;
-      contents = entry.contents;
-    } else {
-      filePath = file;
-      contents = this.processFile(config, filePath);
-      this.updateCache(key, contents);
-    }
+    if (entry) { return; }
+
+    filePath = file;
+    contents = this.processFile(config, filePath);
+    this.updateCache(key, contents);
 
     filePath = path.join(this.outputPath, filePath);
     this.writeFile(filePath, contents);
