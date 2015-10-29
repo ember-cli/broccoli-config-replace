@@ -21,8 +21,7 @@ ConfigReplace.prototype = Object.create(Plugin.prototype);
 ConfigReplace.prototype.constructor = ConfigReplace;
 
 ConfigReplace.prototype.build = function () {
-  var inputPath = this.inputPaths[0],
-      config = this.getConfig();
+  var config = this.getConfig();
 
   this.options.files.forEach(function(file) {
     var key = this.deriveCacheKey(file),
@@ -31,7 +30,7 @@ ConfigReplace.prototype.build = function () {
 
     if (entry) {
       filePath = entry.file;
-      contents = entry.contents
+      contents = entry.contents;
     } else {
       filePath = file;
       contents = this.processFile(config, filePath);
