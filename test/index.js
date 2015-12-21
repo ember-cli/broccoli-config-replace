@@ -1,9 +1,10 @@
-var assert = require('assert'),
-    broccoli = require('broccoli'),
-    ConfigReplace = require('..'),
-    join = require('path').join,
-    fs = require('fs'),
-    tmp = require('tmp-sync');
+var assert = require('assert');
+var broccoli = require('broccoli');
+var ConfigReplace = require('..');
+var join = require('path').join;
+var fs = require('fs');
+var tmp = require('tmp-sync');
+var expect = require('chai').expect;
 
 afterEach(function() {
   if (this.builder) {
@@ -13,10 +14,16 @@ afterEach(function() {
 
 function writeExample(options) {
   var root = tmp.in(join(process.cwd(), 'tmp'));
+
   fs.writeFileSync(join(root, 'config.json'), options.config);
   fs.writeFileSync(join(root, 'index.html'), options.index);
+
   return root;
-};
+}
+
+function read(fullPath) {
+  return fs.readFileSync(fullPath, 'UTF8');
+}
 
 function makeConfigReplace(root, patterns) {
   return new ConfigReplace(
@@ -29,52 +36,53 @@ function makeConfigReplace(root, patterns) {
       patterns: patterns
     }
   );
-};
+}
 
 function makeBuilder(root, patterns) {
   var configReplace = makeConfigReplace(root, patterns);
   return new broccoli.Builder(configReplace);
-};
+}
 
-var expectEquals = function(expected) {
+function expectEquals(expected) {
   return function(results) {
     var resultsPath = join(results.directory, 'index.html'),
         contents = fs.readFileSync(resultsPath, { encoding: 'utf8' });
 
     assert.equal(contents.trim(), expected);
+    return results;
   };
-};
+}
 
 describe('config-replace', function() {
-  it('replaces with text from config.json', function(done) {
+  it('replaces with text from config.json', function() {
     var root = writeExample({
       config: '{"color":"red"}',
       index: '{{color}}'
     });
 
-    makeBuilder(root, [{
+    return makeBuilder(root, [{
       match: /\{\{color\}\}/g,
       replacement: function(config) { return config.color; }
     }]).build().then(
       expectEquals('red')
-    ).then(done).catch(console.log);
+    );
   });
 
-  it('replaces with string passed in via options', function(done) {
+  it('replaces with string passed in via options', function() {
     var root = writeExample({
       config: '{}',
       index: '{{name}}'
     });
 
-    makeBuilder(root, [{
+    return makeBuilder(root, [{
       match: /\{\{name\}\}/g,
       replacement: 'hari'
     }]).build().then(
       expectEquals('hari')
-    ).then(done).catch(console.log);
+    );
   });
 
-  it('rebuilds if the config file changes', function(done) {
+  it('rebuilds if the config file changes', function() {
     var root = writeExample({
       config: '{"pokemon":"diglet"}',
       index: '{{pokemon}}'
@@ -85,17 +93,17 @@ describe('config-replace', function() {
       replacement: function(config) { return config.pokemon; }
     }]);
 
-    builder.build().then(
+    return builder.build().then(
       expectEquals('diglet')
     ).then(function() {
       fs.writeFileSync(join(root, 'config.json'), '{"pokemon":"jigglypuff"}');
       return builder.build();
     }).then(
       expectEquals('jigglypuff')
-    ).then(done).catch(console.log);
+    );
   });
 
-  it('caches the result', function(done) {
+  it('caches the result', function() {
     var root, configReplace, builder, key, entry;
 
     root = writeExample({
@@ -109,14 +117,46 @@ describe('config-replace', function() {
     }]);
 
     builder = new broccoli.Builder(configReplace);
-    builder.build().then(
+
+    var indexStat;
+    return builder.build().then(
       expectEquals('nyc')
     ).then(function() {
-      key = Object.keys(configReplace._cache)[0];
-      entry = configReplace._cache[key];
+      indexStat = fs.statSync(join(root, 'index.html'));
+
       return builder.build();
     }).then(function() {
-      assert.equal(entry, configReplace._cache[key]);
-    }).then(done).catch(console.log);
+      var nextStat = fs.statSync(join(root, 'index.html'));
+      assert.deepEqual(indexStat, nextStat);
+    });
+  });
+
+  it('evicts after change', function() {
+    var root, configReplace, builder, key, entry;
+
+    root = writeExample({
+      config: '{"city":"nyc"}',
+      index: '{{city}}'
+    });
+
+    configReplace = makeConfigReplace(root, [{
+      match: /\{\{city\}\}/g,
+      replacement: function(config) { return config.city; }
+    }]);
+
+    builder = new broccoli.Builder(configReplace);
+
+    var oldContent;
+
+    return builder.build().then(function(results) {
+      oldContent = read(results.directory + '/index.html');
+
+      fs.writeFileSync(root + '/index.html', 'foo');
+      return builder.build();
+    }).then(function(results) {
+
+      var newContent = read(results.directory + '/index.html');
+      expect(newContent).to.not.equal(oldContent);
+    });
   });
 });

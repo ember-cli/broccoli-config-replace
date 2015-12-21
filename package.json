@@ -4,7 +4,8 @@
   "description": "Simple templating using a config.json and regex patterns",
   "main": "index.js",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "test:debug": "mocha debug"
   },
   "repository": {
     "type": "git",
@@ -28,10 +29,12 @@
   "dependencies": {
     "broccoli-kitchen-sink-helpers": "^0.3.1",
     "broccoli-plugin": "^1.2.0",
+    "debug": "^2.2.0",
     "fs-extra": "^0.24.0"
   },
   "devDependencies": {
     "broccoli": "^0.16.8",
+    "chai": "^3.4.1",
     "mocha": "^2.3.3",
     "tmp-sync": "^1.1.0"
   }

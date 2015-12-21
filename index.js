@@ -1,9 +1,10 @@
 'use strict';
 
-var fs = require('fs-extra'),
-    path = require('path'),
-    Plugin = require('broccoli-plugin'),
-    hashStrings = require('broccoli-kitchen-sink-helpers').hashStrings;
+var fs = require('fs-extra');
+var path = require('path');
+var Plugin = require('broccoli-plugin');
+var hashStrings = require('broccoli-kitchen-sink-helpers').hashStrings;
+var debug = require('debug')('broccoli-config-replace');
 
 function ConfigReplace(inputNode, configNode, options) {
   options = options || {};
@@ -26,9 +27,11 @@ ConfigReplace.prototype.build = function () {
   var config = this.getConfig();
 
   this.options.files.forEach(function(file) {
-    var key = this.deriveCacheKey(file),
-        entry = this._cache[key.hash],
-        contents, filePath;
+    var key = this.deriveCacheKey(file);
+    var entry = this._cache[key.hash];
+    var contents, filePath;
+
+    debug('cache hit: %o, for: %s', !!entry, file);
 
     if (entry) { return; }
 
@@ -42,9 +45,10 @@ ConfigReplace.prototype.build = function () {
 };
 
 ConfigReplace.prototype.deriveCacheKey = function(file) {
-  var stats = fs.statSync(this.getConfigPath());
+  var configStat = fs.statSync(this.getConfigPath());
+  var fileStat = fs.statSync(this.inputPaths[0] + '/' + file);
 
-  if (stats.isDirectory()) {
+  if (configStat.isDirectory()) {
     throw new Error('Must provide a path for the config file, you supplied a directory');
   }
 
@@ -52,15 +56,19 @@ ConfigReplace.prototype.deriveCacheKey = function(file) {
     return a + b.match;
   }, '');
 
+
   return {
     file: file,
     hash: hashStrings([
       file,
       this.configPath,
       patterns,
-      stats.size,
-      stats.mode,
-      stats.mtime.getTime()
+      configStat.size,
+      configStat.mode,
+      configStat.mtime.getTime(),
+      fileStat.size,
+      fileStat.mode,
+      fileStat.mtime.getTime(),
     ])
   };
 };
