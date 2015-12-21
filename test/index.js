@@ -4,6 +4,7 @@ var ConfigReplace = require('..');
 var join = require('path').join;
 var fs = require('fs');
 var tmp = require('tmp-sync');
+var expect = require('chai').expect;
 
 afterEach(function() {
   if (this.builder) {
@@ -13,9 +14,15 @@ afterEach(function() {
 
 function writeExample(options) {
   var root = tmp.in(join(process.cwd(), 'tmp'));
+
   fs.writeFileSync(join(root, 'config.json'), options.config);
   fs.writeFileSync(join(root, 'index.html'), options.index);
+
   return root;
+}
+
+function read(fullPath) {
+  return fs.readFileSync(fullPath, 'UTF8');
 }
 
 function makeConfigReplace(root, patterns) {
@@ -42,6 +49,7 @@ function expectEquals(expected) {
         contents = fs.readFileSync(resultsPath, { encoding: 'utf8' });
 
     assert.equal(contents.trim(), expected);
+    return results;
   };
 }
 
@@ -110,14 +118,45 @@ describe('config-replace', function() {
 
     builder = new broccoli.Builder(configReplace);
 
+    var indexStat;
     return builder.build().then(
       expectEquals('nyc')
     ).then(function() {
-      key = Object.keys(configReplace._cache)[0];
-      entry = configReplace._cache[key];
+      indexStat = fs.statSync(join(root, 'index.html'));
+
       return builder.build();
     }).then(function() {
-      assert.equal(entry, configReplace._cache[key]);
+      var nextStat = fs.statSync(join(root, 'index.html'));
+      assert.deepEqual(indexStat, nextStat);
+    });
+  });
+
+  it('evicts after change', function() {
+    var root, configReplace, builder, key, entry;
+
+    root = writeExample({
+      config: '{"city":"nyc"}',
+      index: '{{city}}'
+    });
+
+    configReplace = makeConfigReplace(root, [{
+      match: /\{\{city\}\}/g,
+      replacement: function(config) { return config.city; }
+    }]);
+
+    builder = new broccoli.Builder(configReplace);
+
+    var oldContent;
+
+    return builder.build().then(function(results) {
+      oldContent = read(results.directory + '/index.html');
+
+      fs.writeFileSync(root + '/index.html', 'foo');
+      return builder.build();
+    }).then(function(results) {
+
+      var newContent = read(results.directory + '/index.html');
+      expect(newContent).to.not.equal(oldContent);
     });
   });
 });

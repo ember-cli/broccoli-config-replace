@@ -46,6 +46,7 @@ ConfigReplace.prototype.build = function () {
 
 ConfigReplace.prototype.deriveCacheKey = function(file) {
   var configStat = fs.statSync(this.getConfigPath());
+  var fileStat = fs.statSync(this.inputPaths[0] + '/' + file);
 
   if (configStat.isDirectory()) {
     throw new Error('Must provide a path for the config file, you supplied a directory');
@@ -65,6 +66,9 @@ ConfigReplace.prototype.deriveCacheKey = function(file) {
       configStat.size,
       configStat.mode,
       configStat.mtime.getTime(),
+      fileStat.size,
+      fileStat.mode,
+      fileStat.mtime.getTime(),
     ])
   };
 };

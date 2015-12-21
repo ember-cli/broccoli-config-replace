@@ -4,7 +4,8 @@
   "description": "Simple templating using a config.json and regex patterns",
   "main": "index.js",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "test:debug": "mocha debug"
   },
   "repository": {
     "type": "git",
@@ -33,6 +34,7 @@
   },
   "devDependencies": {
     "broccoli": "^0.16.8",
+    "chai": "^3.4.1",
     "mocha": "^2.3.3",
     "tmp-sync": "^1.1.0"
   }
