@@ -31,6 +31,8 @@ ConfigReplace.prototype.build = function () {
     var entry = this._cache[key.hash];
     var contents, filePath;
 
+    debug('cache hit: %o, for: %s', !!entry, file);
+
     if (entry) { return; }
 
     filePath = file;
