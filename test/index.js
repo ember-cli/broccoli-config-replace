@@ -1,9 +1,9 @@
-var assert = require('assert'),
-    broccoli = require('broccoli'),
-    ConfigReplace = require('..'),
-    join = require('path').join,
-    fs = require('fs'),
-    tmp = require('tmp-sync');
+var assert = require('assert');
+var broccoli = require('broccoli');
+var ConfigReplace = require('..');
+var join = require('path').join;
+var fs = require('fs');
+var tmp = require('tmp-sync');
 
 afterEach(function() {
   if (this.builder) {
@@ -16,7 +16,7 @@ function writeExample(options) {
   fs.writeFileSync(join(root, 'config.json'), options.config);
   fs.writeFileSync(join(root, 'index.html'), options.index);
   return root;
-};
+}
 
 function makeConfigReplace(root, patterns) {
   return new ConfigReplace(
@@ -29,21 +29,21 @@ function makeConfigReplace(root, patterns) {
       patterns: patterns
     }
   );
-};
+}
 
 function makeBuilder(root, patterns) {
   var configReplace = makeConfigReplace(root, patterns);
   return new broccoli.Builder(configReplace);
-};
+}
 
-var expectEquals = function(expected) {
+function expectEquals(expected) {
   return function(results) {
     var resultsPath = join(results.directory, 'index.html'),
         contents = fs.readFileSync(resultsPath, { encoding: 'utf8' });
 
     assert.equal(contents.trim(), expected);
   };
-};
+}
 
 describe('config-replace', function() {
   it('replaces with text from config.json', function() {
