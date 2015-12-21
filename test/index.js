@@ -46,35 +46,35 @@ var expectEquals = function(expected) {
 };
 
 describe('config-replace', function() {
-  it('replaces with text from config.json', function(done) {
+  it('replaces with text from config.json', function() {
     var root = writeExample({
       config: '{"color":"red"}',
       index: '{{color}}'
     });
 
-    makeBuilder(root, [{
+    return makeBuilder(root, [{
       match: /\{\{color\}\}/g,
       replacement: function(config) { return config.color; }
     }]).build().then(
       expectEquals('red')
-    ).then(done).catch(console.log);
+    );
   });
 
-  it('replaces with string passed in via options', function(done) {
+  it('replaces with string passed in via options', function() {
     var root = writeExample({
       config: '{}',
       index: '{{name}}'
     });
 
-    makeBuilder(root, [{
+    return makeBuilder(root, [{
       match: /\{\{name\}\}/g,
       replacement: 'hari'
     }]).build().then(
       expectEquals('hari')
-    ).then(done).catch(console.log);
+    );
   });
 
-  it('rebuilds if the config file changes', function(done) {
+  it('rebuilds if the config file changes', function() {
     var root = writeExample({
       config: '{"pokemon":"diglet"}',
       index: '{{pokemon}}'
@@ -85,17 +85,17 @@ describe('config-replace', function() {
       replacement: function(config) { return config.pokemon; }
     }]);
 
-    builder.build().then(
+    return builder.build().then(
       expectEquals('diglet')
     ).then(function() {
       fs.writeFileSync(join(root, 'config.json'), '{"pokemon":"jigglypuff"}');
       return builder.build();
     }).then(
       expectEquals('jigglypuff')
-    ).then(done).catch(console.log);
+    );
   });
 
-  it('caches the result', function(done) {
+  it('caches the result', function() {
     var root, configReplace, builder, key, entry;
 
     root = writeExample({
@@ -109,7 +109,8 @@ describe('config-replace', function() {
     }]);
 
     builder = new broccoli.Builder(configReplace);
-    builder.build().then(
+
+    return builder.build().then(
       expectEquals('nyc')
     ).then(function() {
       key = Object.keys(configReplace._cache)[0];
@@ -117,6 +118,6 @@ describe('config-replace', function() {
       return builder.build();
     }).then(function() {
       assert.equal(entry, configReplace._cache[key]);
-    }).then(done).catch(console.log);
+    });
   });
 });
