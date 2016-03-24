@@ -95,7 +95,7 @@ ConfigReplace.prototype.processFile = function(config, filePath) {
 
 ConfigReplace.prototype.writeFile = function(destPath, contents) {
   if (!fs.existsSync(path.dirname(destPath))) {
-    fs.mkdirSync(path.dirname(destPath));
+    fs.mkdirpSync(path.dirname(destPath));
   }
 
   fs.writeFileSync(destPath, contents, { encoding: 'utf8' });
