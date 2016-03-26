@@ -159,4 +159,36 @@ describe('config-replace', function() {
       expect(newContent).to.not.equal(oldContent);
     });
   });
+
+  it('handle nested paths', function() {
+    var root, configReplace, builder;
+
+    root = tmp.in(join(process.cwd(), 'tmp'));
+
+    fs.writeFileSync(join(root, 'config.json'), '{"color":"red"}');
+    fs.mkdirSync(join(root, 'dir1'));
+    fs.mkdirSync(join(root, 'dir1', 'dir2'));
+    fs.writeFileSync(join(root, 'dir1', 'dir2', 'index.html'), "{{color}}");
+
+    configReplace = new ConfigReplace(
+      root,
+      root, {
+        files: ['dir1/dir2/index.html'],
+        configPath: 'config.json',
+        patterns: [{
+          match: /\{\{color\}\}/g,
+          replacement: 'red'
+        }]
+      }
+    );
+
+    builder = new broccoli.Builder(configReplace);
+
+    return builder.build().then(function(results) {
+      var resultsPath = join(results.directory, 'dir1', 'dir2', 'index.html'),
+          contents = fs.readFileSync(resultsPath, { encoding: 'utf8' });
+
+      assert.equal(contents.trim(), 'red');
+    })
+  });
 });
