@@ -33,12 +33,12 @@
     "broccoli-kitchen-sink-helpers": "^0.3.1",
     "broccoli-plugin": "^1.2.0",
     "debug": "^2.2.0",
-    "fs-extra": "^0.24.0"
+    "fs-extra": "^0.30.0"
   },
   "devDependencies": {
     "broccoli": "^0.16.8",
     "chai": "^3.4.1",
-    "mocha": "^2.3.3",
+    "mocha": "^3.1.2",
     "tmp-sync": "^1.1.0"
   }
 }
