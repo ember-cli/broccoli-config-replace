@@ -29,8 +29,7 @@
     "url": "https://github.com/ember-cli/broccoli-config-replace/issues"
   },
   "homepage": "https://github.com/ember-cli/broccoli-config-replace#readme",
-  "dependencies": {
-    "broccoli-kitchen-sink-helpers": "^0.3.1",
+  "dependencies": { 
     "broccoli-plugin": "^1.2.0",
     "debug": "^2.2.0",
     "fs-extra": "^0.24.0"
