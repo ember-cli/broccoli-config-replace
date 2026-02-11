@@ -3,8 +3,14 @@
 var fs = require('fs-extra');
 var path = require('path');
 var Plugin = require('broccoli-plugin');
-var hashStrings = require('broccoli-kitchen-sink-helpers').hashStrings;
+var crypto = require('crypto')
 var debug = require('debug')('broccoli-config-replace');
+
+// inlined from broccoli-kitchen-sink-helpers
+function hashStrings (strings) {
+  var joinedStrings = strings.join('\x00')
+  return crypto.createHash('md5').update(new Buffer(joinedStrings, 'utf8')).digest('hex')
+}
 
 function ConfigReplace(inputNode, configNode, options) {
   options = options || {};
