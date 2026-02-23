@@ -2,18 +2,6 @@
   "name": "broccoli-config-replace",
   "version": "1.1.2",
   "description": "Simple templating using a config.json and regex patterns",
-  "main": "index.js",
-  "files": [
-    "index.js"
-  ],
-  "scripts": {
-    "test": "mocha",
-    "test:debug": "mocha debug"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/ember-cli/broccoli-config-replace"
-  },
   "keywords": [
     "broccoli",
     "broccoli-plugin",
@@ -23,12 +11,24 @@
     "template",
     "js"
   ],
-  "author": "yaymukund <yaymukund+broccoli-config-replace@gmail.com>",
-  "license": "MIT",
+  "homepage": "https://github.com/ember-cli/broccoli-config-replace#readme",
   "bugs": {
     "url": "https://github.com/ember-cli/broccoli-config-replace/issues"
   },
-  "homepage": "https://github.com/ember-cli/broccoli-config-replace#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ember-cli/broccoli-config-replace"
+  },
+  "license": "MIT",
+  "author": "yaymukund <yaymukund+broccoli-config-replace@gmail.com>",
+  "main": "index.js",
+  "files": [
+    "index.js"
+  ],
+  "scripts": {
+    "test": "mocha",
+    "test:debug": "mocha debug"
+  },
   "dependencies": {
     "broccoli-plugin": "^1.2.0",
     "debug": "^2.2.0",
@@ -38,6 +38,7 @@
     "broccoli": "^0.16.8",
     "chai": "^3.4.1",
     "mocha": "^2.3.3",
+    "release-plan": "^0.17.4",
     "tmp-sync": "^1.1.0"
   },
   "packageManager": "pnpm@10.30.0+sha512.2b5753de015d480eeb88f5b5b61e0051f05b4301808a82ec8b840c9d2adf7748eb352c83f5c1593ca703ff1017295bc3fdd3119abb9686efc96b9fcb18200937"
